@@ -1,6 +1,6 @@
 export type ApiType = 'TSClient' | 'TSServer'
 
-export interface NlpmManifest {
+export interface AtlpmManifest {
   apiType?: ApiType
   schemaDir?: string
   outDir?: string

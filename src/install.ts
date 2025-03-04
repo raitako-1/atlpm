@@ -1,7 +1,7 @@
 import path from 'path'
 import chalk from 'chalk'
 import { NSID } from '@atproto/syntax'
-import { GeneratedFile, NlpmManifest } from './types'
+import { GeneratedFile, AtlpmManifest } from './types'
 import { genApi } from './codegen'
 import {
   applyFileDiff,
@@ -13,12 +13,12 @@ import {
 } from './util'
 
 export async function install(
-  manifest: NlpmManifest,
+  manifest: AtlpmManifest,
   yes: boolean,
   dir?: string,
 ): Promise<void> {
   if (manifest.apiType !== 'TSClient' && manifest.apiType !== 'TSServer') {
-    throw new Error('ERR_NLPM_JSON', { cause: 'Invalid apiType in nlpm.json'})
+    throw new Error('ERR_ATLPM_JSON', { cause: 'Invalid apiType in atlpm.json'})
   }
   manifest.schemaDir = manifest.schemaDir ?? './lexicons'
   manifest.outDir = manifest.outDir ?? './src/lexicon'

@@ -7,7 +7,7 @@ import inquirer from 'inquirer'
 import { Command } from 'commander'
 import { NSID } from '@atproto/syntax'
 import { install } from './install'
-import { NlpmManifest } from './types'
+import { AtlpmManifest } from './types'
 import { confirmOrExit } from './util'
 import * as pkg from '../package.json'
 
@@ -21,11 +21,11 @@ program
   .option('-y, --yes', 'skip confirmation')
   .argument('<schemas...>', '<registry(local or github or url)>:<NSID>')
   .action(async (schemas: string[], o: {dir?: string, yes?: true}) => {
-    const manifestPath = path.join(o.dir ?? process.cwd(), 'nlpm.json')
+    const manifestPath = path.join(o.dir ?? process.cwd(), 'atlpm.json')
     if (!fs.existsSync(manifestPath)) {
-      throw new Error('ERR_NLPM_JSON_NO_EXISTS', { cause: `nlpm.json no exists. Try to run \`nlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
+      throw new Error('ERR_ATLPM_JSON_NO_EXISTS', { cause: `atlpm.json no exists. Try to run \`atlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
     }
-    const manifest: NlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+    const manifest: AtlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
     manifest.lexicons = manifest.lexicons ?? {}
     const addLexicons: Record<string, string> = {}
     for await (let schema of schemas) {
@@ -80,12 +80,12 @@ program
 
 program
   .command('init')
-  .description('Creates a nlpm.json file')
+  .description('Creates a atlpm.json file')
   .option('-C, --dir <path>', 'path of the current working directory', toPath)
   .action(async (o: {dir?: string}) => {
-    const manifestPath = path.join(o.dir ?? process.cwd(), 'nlpm.json')
+    const manifestPath = path.join(o.dir ?? process.cwd(), 'atlpm.json')
     if (fs.existsSync(manifestPath)) {
-      throw new Error('ERR_NLPM_JSON_EXISTS', { cause: 'nlpm.json already exists' })
+      throw new Error('ERR_ATLPM_JSON_EXISTS', { cause: 'atlpm.json already exists' })
     }
     const answers = await inquirer
       .prompt([
@@ -108,18 +108,18 @@ program
           default: './src/lexicon',
         },
       ])
-    const manifest: NlpmManifest = {
+    const manifest: AtlpmManifest = {
       apiType: 'TSServer',
       schemaDir: './lexicons',
       outDir: './src/lexicon',
       lexicons: {},
     }
-    const nlpmJson = { ...manifest, ...answers }
+    const atlpmJson = { ...manifest, ...answers }
     await fs.promises.mkdir(path.dirname(manifestPath), { recursive: true })
-    fs.writeFileSync(manifestPath, `${JSON.stringify(nlpmJson, undefined, 2)}\n`)
+    fs.writeFileSync(manifestPath, `${JSON.stringify(atlpmJson, undefined, 2)}\n`)
     console.log(`Wrote to ${manifestPath}
 
-${JSON.stringify(nlpmJson, null, 2)}`)
+${JSON.stringify(atlpmJson, null, 2)}`)
     console.log('Done!')
   })
 
@@ -129,11 +129,11 @@ program
   .option('-y, --yes', 'skip confirmation')
   .description('Fetch and codegen all lexicons')
   .action(async (o: {dir?: string, yes?: true}) => {
-    const manifestPath = path.join(o.dir ?? process.cwd(), 'nlpm.json')
+    const manifestPath = path.join(o.dir ?? process.cwd(), 'atlpm.json')
     if (!fs.existsSync(manifestPath)) {
-      throw new Error('ERR_NLPM_JSON_NO_EXISTS', { cause: `nlpm.json no exists. Try to run \`nlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
+      throw new Error('ERR_ATLPM_JSON_NO_EXISTS', { cause: `atlpm.json no exists. Try to run \`atlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
     }
-    const manifest: NlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+    const manifest: AtlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
     await install(manifest, o.yes ? true : false, o.dir)
     console.log('Done!')
   })
@@ -145,11 +145,11 @@ program
   .description('Removes lexicons')
   .argument('<nsids...>', 'NSIDs')
   .action(async (nsids: string[], o: {dir?: string, yes?: true}) => {
-    const manifestPath = path.join(o.dir ?? process.cwd(), 'nlpm.json')
+    const manifestPath = path.join(o.dir ?? process.cwd(), 'atlpm.json')
     if (!fs.existsSync(manifestPath)) {
-      throw new Error('ERR_NLPM_JSON_NO_EXISTS', { cause: `nlpm.json no exists. Try to run \`nlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
+      throw new Error('ERR_ATLPM_JSON_NO_EXISTS', { cause: `atlpm.json no exists. Try to run \`atlpm init${o.dir ? ` --dir ${o.dir}` :''}\`` })
     }
-    const manifest: NlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+    const manifest: AtlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
     manifest.lexicons = manifest.lexicons ?? {}
     let modtext = chalk.cyanBright('lexicons:')
     for (const delNsid of nsids.sort()) {

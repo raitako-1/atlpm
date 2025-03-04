@@ -9,5 +9,5 @@ export async function genApi(
 ): Promise<GeneratedAPI> {
   if (apiType === 'TSClient') return await genClientApi(lexiconDocs)
   if (apiType === 'TSServer') return await genServerApi(lexiconDocs)
-  throw new Error('ERR_NLPM_JSON', { cause: 'Invalid apiType in nlpm.json'})
+  throw new Error('ERR_ATLPM_JSON', { cause: 'Invalid apiType in atlpm.json'})
 }
