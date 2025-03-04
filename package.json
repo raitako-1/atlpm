@@ -1,6 +1,6 @@
 {
   "name": "atlpm",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "ATProtocol Lexicon Package Manager",
   "bin": {
     "atlpm": "dist/index.js"
@@ -21,7 +21,7 @@
   "dependencies": {
     "@atproto/lexicon": "^0.4.7",
     "@atproto/syntax": "^0.3.3",
-    "chalk": "^5.4.1",
+    "chalk": "^4.1.2",
     "commander": "^13.1.0",
     "inquirer": "^12.4.2",
     "prettier": "^3.5.3",
