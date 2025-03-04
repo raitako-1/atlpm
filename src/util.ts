@@ -70,6 +70,26 @@ export async function fetchSchemas(files: GeneratedFile[], nsid: NSID, registry:
     if (registry === 'github') {
       if (nsid.authority.endsWith('bsky.app') || nsid.authority.endsWith('bsky.chat') || nsid.authority.endsWith('atproto.com') || nsid.authority.endsWith('ozone.tools')) {
         url = `https://raw.githubusercontent.com/bluesky-social/atproto/refs/heads/main/lexicons/${schemaFileName}`
+      } else if (nsid.authority.endsWith('linkat.blue')) {
+        url = `https://raw.githubusercontent.com/mkizka/linkat/refs/heads/main/lexicons/${schemaFileName}`
+      } else if (nsid.authority.endsWith('whtwnd.com')) {
+        url = `https://raw.githubusercontent.com/whtwnd/whitewind-blog/refs/heads/main/lexicons/${schemaFileName}`
+      } else if (nsid.authority.endsWith('unravel.fyi')) {
+        url = `https://raw.githubusercontent.com/likeandscribe/frontpage/refs/heads/main/lexicons/${schemaFileName}`
+      } else if (nsid.authority.endsWith('smokesignal.events')) {
+        url = `https://raw.githubusercontent.com/SmokeSignal-Events/lexicon/refs/heads/main/${schemaFileName}`
+      } else if (nsid.authority.endsWith('pastesphere.link')) {
+        const [, , ...name] = nsid.segments
+        url = `https://raw.githubusercontent.com/echo8/pastesphere/refs/heads/main/lexicons/${name.join('/')}.json`
+      } else if (nsid.authority.endsWith('psky.social')) {
+        url = `https://raw.githubusercontent.com/psky-atp/appview/refs/heads/main/lexicons/${schemaFileName}`
+      } else if (nsid.authority.endsWith('moji.blue')) {
+        const [, , ...name] = nsid.segments
+        url = `https://raw.githubusercontent.com/marukun712/stellar/refs/heads/master/lexicons/bluemoji/${name.join('/')}.json`
+      } else if (nsid.authority.endsWith('stellar.maril.blue')) {
+        url = `https://raw.githubusercontent.com/marukun712/stellar/refs/heads/master/lexicons/stellar/${nsid.name}.json`
+      } else if (nsid.authority.endsWith('evex.land')) {
+        url = `https://raw.githubusercontent.com/evex-dev/atratch-server/refs/heads/main/lexicons/${schemaFileName}`
       } else {
         console.error(chalk.red(`Unknown authority in github: ${nsid.authority}`))
         return

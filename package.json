@@ -1,6 +1,6 @@
 {
   "name": "atlpm",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "ATProtocol Lexicon Package Manager",
   "bin": {
     "atlpm": "dist/index.js"
