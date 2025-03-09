@@ -73,7 +73,10 @@ program
       }
     }
     if (modtext.split('\n').length > 1) console.log(modtext)
-    manifest.lexicons = Object.fromEntries(Object.entries(manifest.lexicons).sort((a,b)=>a[0].charCodeAt(0) - b[0].charCodeAt(0)))
+    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object, key) => {
+      if (manifest.lexicons) object[key] = manifest.lexicons[key]
+      return object
+    }, {})
     await fs.promises.mkdir(path.dirname(manifestPath), { recursive: true })
     fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, undefined, 2)}\n`)
     console.log(`Wrote to ${manifestPath}`)
@@ -162,7 +165,10 @@ program
       }
     }
     if (modtext.split('\n').length > 1) console.log(modtext)
-    manifest.lexicons = Object.fromEntries(Object.entries(manifest.lexicons).sort((a,b)=>a[0].charCodeAt(0) - b[0].charCodeAt(0)))
+    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object, key) => {
+      if (manifest.lexicons) object[key] = manifest.lexicons[key]
+      return object
+    }, {})
     await fs.promises.mkdir(path.dirname(manifestPath), { recursive: true })
     fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, undefined, 2)}\n`)
     console.log(`Wrote to ${manifestPath}`)
