@@ -7,7 +7,7 @@ import inquirer from 'inquirer'
 import { Command } from 'commander'
 import { NSID } from '@atproto/syntax'
 import { install } from './install'
-import { AtlpmManifest } from './types'
+import { AtlpmManifest, registryData } from './types'
 import { confirmOrExit } from './util'
 import * as pkg from '../package.json'
 
@@ -36,7 +36,7 @@ program
         continue
       }
       const registry = schema.replace(/:[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$/, '')
-      const schemaPath = path.join(o.dir ? path.join(o.dir, manifest.schemaDir ?? './lexicons') : path.resolve(manifest.schemaDir ?? './lexicons'), `${nsid.replace(/\./g, '/')}.json`)
+      const schemaPath = path.join(o.dir ? path.join(o.dir, manifest.schemaDir ?? './lexicons') : path.resolve(manifest.schemaDir ?? './lexicons'), `${nsid.split('.').join('/')}.json`)
       if (registry === 'local') {
         addLexicons[nsid] = registry
         if (!fs.existsSync(schemaPath) && !o.yes) await confirmOrExit('Are you sure you want to continue without write schema?', async () => {
@@ -51,14 +51,17 @@ program
         })
       } else if (registry === 'github' || URL.canParse(registry)) {
         addLexicons[nsid] = registry
+      } else if (Object.keys(registryData.github).some(domain => nsid.endsWith(domain))) {
+          addLexicons[nsid] = 'github'
       } else if (fs.existsSync(schemaPath)) {
         addLexicons[nsid] = 'local'
       } else {
-          addLexicons[nsid] = 'github'
+        console.error(chalk.red(`Unknown registry type: ${registry}`))
+        continue
       }
     }
     let modtext = chalk.cyanBright('lexicons:')
-    for (const addNsid of Object.keys(Object.fromEntries(Object.entries(addLexicons).sort((a,b)=>a[0].charCodeAt(0) - b[0].charCodeAt(0))))) {
+    for (const addNsid of Object.keys(addLexicons).sort()) {
       if (addNsid in manifest.lexicons) {
         if (addLexicons[addNsid] !== manifest.lexicons[addNsid]) {
           manifest.lexicons[addNsid] = addLexicons[addNsid]

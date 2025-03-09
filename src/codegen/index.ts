@@ -1,11 +1,11 @@
 import { LexiconDoc } from '@atproto/lexicon'
-import { GeneratedAPI } from '../types'
+import { ApiType, GeneratedAPI } from '../types'
 import { genClientApi } from './client'
 import { genServerApi } from './server'
 
 export async function genApi(
   lexiconDocs: LexiconDoc[],
-  apiType: string,
+  apiType: ApiType,
 ): Promise<GeneratedAPI> {
   if (apiType === 'TSClient') return await genClientApi(lexiconDocs)
   if (apiType === 'TSServer') return await genServerApi(lexiconDocs)
