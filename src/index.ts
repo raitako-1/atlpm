@@ -51,12 +51,12 @@ program
         })
       } else if (registry === 'github' || URL.canParse(registry)) {
         addLexicons[nsid] = registry
-      } else if (Object.keys(registryData.github).some(domain => nsid.endsWith(domain))) {
+      } else if (Object.keys(registryData.github).some(domain => NSID.parse(nsid).authority.endsWith(domain))) {
           addLexicons[nsid] = 'github'
       } else if (fs.existsSync(schemaPath)) {
         addLexicons[nsid] = 'local'
       } else {
-        console.error(chalk.red(`Unknown registry type: ${registry}`))
+        console.error(chalk.red(`${registry ? `${registry}:`: ''}${nsid} is an unknown registry type.`))
         continue
       }
     }
