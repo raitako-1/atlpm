@@ -25,11 +25,8 @@ export async function fetchAllSchemas(
       continue
     }
     console.log(`Fetch ${nsid}`)
-    try {
-      schemaFiles.push(await fetchSchema(schemaPath, NSID.parse(nsid), registry))
-    } catch {
-      continue
-    }
+    await fetchSchema(schemaPath, NSID.parse(nsid), registry)
+      .then((schema) => schemaFiles.push(schema))
   }
   const mainSchemaFiles = [...schemaFiles]
   console.log(`Fetch all dependencies`)
@@ -72,8 +69,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
     console.log(chalk.gray(`Get ${url.href}`))
     let str: string
     try {
-      const response = await fetch(url)
-      str = await response.text()
+      str = await (await fetch(url)).text()
     } catch (e) {
       if (outErr) console.error(chalk.red(`Failed to GET url: ${url.href}`))
       throw e
@@ -90,8 +86,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
     console.log(chalk.gray(`Get ${url.href}`))
     let str: string
     try {
-      const response = await fetch(url)
-      str = await response.text()
+      str = await (await fetch(url)).text()
     } catch (e) {
       if (outErr) console.error(chalk.red(`Failed to GET url: ${url.href}`))
       throw e
@@ -145,7 +140,6 @@ const getAllLexDependencies = async (schemaPath: string, schemaFiles: GeneratedF
           break
         } catch {
           i++
-          continue
         }
       }
       if (i === registries.length) console.error(chalk.red(`${importNsid} could not be loaded in any registry!`))

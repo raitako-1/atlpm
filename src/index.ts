@@ -28,7 +28,7 @@ program
     const manifest: AtlpmManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
     manifest.lexicons = manifest.lexicons ?? {}
     const addLexicons: Record<string, string> = {}
-    for await (let schema of schemas) {
+    for (let schema of schemas) {
       if (!schema.includes(':')) schema = `:${schema}`
       const nsid = schema.split(':')[schema.split(':').length - 1]
       if (!NSID.isValid(nsid)) {
