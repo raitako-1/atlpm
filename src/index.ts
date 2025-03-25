@@ -7,7 +7,7 @@ import inquirer from 'inquirer'
 import { Command } from 'commander'
 import { NSID } from '@atproto/syntax'
 import { install } from './install'
-import { AtlpmManifest, registryData } from './types'
+import { type AtlpmManifest, registryData } from './types'
 import { confirmOrExit } from './util'
 import * as pkg from '../package.json'
 

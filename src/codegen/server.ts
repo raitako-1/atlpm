@@ -4,9 +4,9 @@ import {
   SourceFile,
   VariableDeclarationKind,
 } from 'ts-morph'
-import { LexiconDoc, Lexicons } from '@atproto/lexicon'
+import { type LexiconDoc, Lexicons } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
-import { GeneratedAPI } from '../types'
+import { type GeneratedAPI } from '../types'
 import { gen, lexiconsTs, utilTs } from './common'
 import {
   genCommonImports,
@@ -18,7 +18,7 @@ import {
   genXrpcParams,
 } from './lex-gen'
 import {
-  DefTreeNode,
+  type DefTreeNode,
   lexiconsToDefTree,
   schemasToNsidTokens,
   toCamelCase,
@@ -53,7 +53,7 @@ const indexTs = (
   nsidTokens: Record<string, string[]>,
 ) =>
   gen(project, '/index.ts', async (file) => {
-    //= import {createServer as createXrpcServer, Server as XrpcServer} from '@atproto/xrpc-server'
+    //= import {createServer as createXrpcServer, Server as XrpcServer, type Options as XrpcOptions, type AuthVerifier, type StreamAuthVerifier} from '@atproto/xrpc-server'
     file.addImportDeclaration({
       moduleSpecifier: '@atproto/xrpc-server',
       namedImports: [
@@ -68,9 +68,10 @@ const indexTs = (
         {
           name: 'Options',
           alias: 'XrpcOptions',
+          isTypeOnly: true,
         },
-        { name: 'AuthVerifier' },
-        { name: 'StreamAuthVerifier' },
+        { name: 'AuthVerifier', isTypeOnly: true },
+        { name: 'StreamAuthVerifier', isTypeOnly: true },
       ],
     })
     //= import {schemas} from './lexicons.js'

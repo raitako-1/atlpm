@@ -1,5 +1,5 @@
 import path from 'path'
-import { AtlpmManifest } from './types'
+import { type AtlpmManifest } from './types'
 import { genApi } from './codegen'
 import { fetchAllSchemas } from './fetch'
 import {

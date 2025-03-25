@@ -2,9 +2,9 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import yesno from 'yesno'
-import { LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
-import { ZodError, ZodFormattedError } from 'zod'
-import { FileDiff, GeneratedFile } from './types'
+import { ZodError, type ZodFormattedError } from 'zod'
+import { type LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
+import { type FileDiff, type GeneratedFile } from './types'
 
 export async function confirmOrExit(q: string, noFn?: () => Promise<void>) {
   const ok = await yesno({

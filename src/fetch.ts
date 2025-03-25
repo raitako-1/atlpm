@@ -1,10 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
+import { IndentationText, Project } from 'ts-morph'
 import { Lexicons } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
-import { IndentationText, Project } from 'ts-morph'
-import { ApiType, GeneratedFile, registryData } from './types'
+import { type ApiType, type GeneratedFile, registryData } from './types'
 import { readLexicon } from './util'
 import {
   genRecord,

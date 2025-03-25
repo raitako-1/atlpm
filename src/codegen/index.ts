@@ -1,5 +1,5 @@
-import { LexiconDoc } from '@atproto/lexicon'
-import { ApiType, GeneratedAPI } from '../types'
+import { type LexiconDoc } from '@atproto/lexicon'
+import { type ApiType, type GeneratedAPI } from '../types'
 import { genClientApi } from './client'
 import { genServerApi } from './server'
 
