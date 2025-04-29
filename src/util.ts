@@ -112,6 +112,8 @@ export async function printFileDiff(diff: FileDiff[], yes: boolean) {
   if (modtext.split('\n').length > 1) {
     console.log(modtext)
     if (!yes) await confirmOrExit('Are you sure you want to continue?')
+  } else {
+    console.log('No changes were made to the files.')
   }
 }
 
