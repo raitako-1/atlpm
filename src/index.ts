@@ -3,9 +3,9 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import inquirer from 'inquirer'
 import { Command } from 'commander'
 import { NSID } from '@atproto/syntax'
+import { checkbox, editor, input } from '@inquirer/prompts'
 import { install } from './install'
 import { type AtlpmManifest, registryData } from './types'
 import { confirmOrExit } from './util'
@@ -40,14 +40,11 @@ program
       if (registry === 'local') {
         addLexicons[nsid] = registry
         if (!fs.existsSync(schemaPath) && !o.yes) await confirmOrExit('Are you sure you want to continue without write schema?', async () => {
-          const schema = await inquirer
-            .prompt([{
-              type: 'editor',
-              name: 'content',
-              message: `Edit ${schemaPath}:`,
-            }])
+          const schema = await editor({
+            message: `Edit ${schemaPath}:`,
+          })
           await fs.promises.mkdir(path.dirname(schemaPath), { recursive: true })
-          fs.writeFileSync(schemaPath, schema.content)
+          fs.writeFileSync(schemaPath, schema)
         })
       } else if (registry === 'github' || URL.canParse(registry)) {
         addLexicons[nsid] = registry
@@ -93,39 +90,47 @@ program
     if (fs.existsSync(manifestPath)) {
       throw new Error('ERR_ATLPM_JSON_EXISTS', { cause: 'atlpm.json already exists' })
     }
-    const answers = await inquirer
-      .prompt([
-        {
-          type: 'list',
-          name: 'apiType',
-          message: 'Choose the type of API when codegen:',
-          choices: [{name: 'TypeScript client API', value: 'TSClient'}, {name: 'TypeScript server API', value: 'TSServer'}],
-        },
-        {
-          type: 'input',
-          name: 'schemaDir',
-          message: 'Enter a local path to lexicons folder:',
-          default: './lexicons',
-        },
-        {
-          type: 'input',
-          name: 'outDir',
-          message: 'Enter a local path to output folder:',
-          default: './src/lexicon',
-        },
-      ])
     const manifest: AtlpmManifest = {
-      apiType: 'TSServer',
-      schemaDir: './lexicons',
-      outDir: './src/lexicon',
-      lexicons: {},
+      apiTypes: {},
     }
-    const atlpmJson = { ...manifest, ...answers }
+    const apiTypes = await checkbox({
+      message: 'Choose the type of API when codegen:',
+      choices: [
+        {
+          name: 'TypeScript Client API',
+          value: 'TSClient',
+        },
+        {
+          name: 'TypeScript Server API',
+          value: 'TSServer',
+        },
+      ],
+    })
+    for (const apiType of apiTypes) {
+      if (manifest.apiTypes) {
+        if (apiType === 'TSClient') {
+          manifest.apiTypes.TSClient = await input({
+            message: 'Enter a local path to TypeScript Client API folder:',
+            default: apiTypes.length > 1 ? './src/lexicon/client' : './src/client',
+          })
+        } else if (apiType === 'TSServer') {
+          manifest.apiTypes.TSServer = await input({
+            message: 'Enter a local path to TypeScript Server API folder:',
+            default: apiTypes.length > 1 ? './src/lexicon/server' : './src/lexicon',
+          })
+        }
+      }
+    }
+    manifest.schemaDir = await input({
+      message: 'Enter a local path to lexicons folder:',
+      default: './lexicons',
+    })
+    manifest.lexicons = {}
     await fs.promises.mkdir(path.dirname(manifestPath), { recursive: true })
-    fs.writeFileSync(manifestPath, `${JSON.stringify(atlpmJson, undefined, 2)}\n`)
+    fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, undefined, 2)}\n`)
     console.log(`Wrote to ${manifestPath}
 
-${JSON.stringify(atlpmJson, null, 2)}`)
+${JSON.stringify(manifest, null, 2)}`)
     console.log('Done!')
   })
 

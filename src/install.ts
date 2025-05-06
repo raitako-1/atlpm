@@ -1,5 +1,5 @@
 import path from 'path'
-import { type AtlpmManifest } from './types'
+import { ApiTypes, type AtlpmManifest } from './types'
 import { genApi } from './codegen'
 import { fetchAllSchemas } from './fetch'
 import {
@@ -7,7 +7,6 @@ import {
   genFileDiff,
   printFileDiff,
   readAllLexicons,
-  readdirRecursiveSync,
 } from './util'
 
 export async function install(
@@ -15,27 +14,26 @@ export async function install(
   yes: boolean,
   dir?: string,
 ): Promise<void> {
-  if (manifest.apiType !== 'TSClient' && manifest.apiType !== 'TSServer') {
-    throw new Error('ERR_ATLPM_JSON', { cause: 'Invalid apiType in atlpm.json'})
-  }
+  manifest.apiTypes = manifest.apiTypes ?? {}
   manifest.schemaDir = manifest.schemaDir ?? './lexicons'
-  manifest.outDir = manifest.outDir ?? './src/lexicon'
   manifest.lexicons = manifest.lexicons ?? {}
   if (Object.keys(manifest.lexicons).length <= 0) return
   const schemaPath = dir ? path.join(dir, manifest.schemaDir) : path.resolve(manifest.schemaDir)
-  const outPath = dir ? path.join(dir, manifest.outDir) : path.resolve(manifest.outDir)
 
-  const schemaFiles = await fetchAllSchemas(schemaPath, manifest.lexicons, manifest.apiType)
-  const schemaDiff = genFileDiff(schemaPath, schemaFiles, '.json')
+  const schemaFiles = await fetchAllSchemas(schemaPath, manifest.lexicons, manifest.apiTypes)
+  const schemaDiff = genFileDiff(schemaPath, schemaFiles.all, '.json')
   await printFileDiff(schemaDiff, yes)
   applyFileDiff(schemaDiff)
   console.log('All schemas wrote.')
 
-  const schemaPaths = readdirRecursiveSync(schemaPath, '.json')
-  const lexicons = readAllLexicons(schemaPaths)
-  const api = await genApi(lexicons, manifest.apiType)
-  const apiDiff = genFileDiff(outPath, api.files, '.ts')
-  await printFileDiff(apiDiff, yes)
-  applyFileDiff(apiDiff)
+  for (const apiType of Object.keys(manifest.apiTypes)) {
+    const schemaPaths: Set<string> = new Set()
+    for (const relativePath of schemaFiles.api[apiType]) schemaPaths.add(path.join(schemaPath, relativePath))
+    const lexicons = readAllLexicons(schemaPaths)
+    const api = await genApi(lexicons, apiType as keyof ApiTypes)
+    const apiDiff = genFileDiff(manifest.apiTypes[apiType], api.files, '.ts')
+    await printFileDiff(apiDiff, yes)
+    applyFileDiff(apiDiff)
+  }
   console.log('API generated.')
 }

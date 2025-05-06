@@ -1,11 +1,13 @@
 import { NSID } from '@atproto/syntax'
 
-export type ApiType = 'TSClient' | 'TSServer'
+export interface ApiTypes {
+  TSClient?: string
+  TSServer?: string
+}
 
 export interface AtlpmManifest {
-  apiType?: ApiType
+  apiTypes?: ApiTypes
   schemaDir?: string
-  outDir?: string
   lexicons?: Record<string, string>
 }
 
@@ -16,6 +18,13 @@ export interface GeneratedFile {
 
 export interface GeneratedAPI {
   files: GeneratedFile[]
+}
+
+export interface GeneratedSchema {
+  all: GeneratedFile[]
+  api: {
+    [k: string]: Set<string>
+  }
 }
 
 export interface FileDiff {

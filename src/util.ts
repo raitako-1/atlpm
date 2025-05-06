@@ -21,7 +21,7 @@ export async function confirmOrExit(q: string, noFn?: () => Promise<void>) {
   }
 }
 
-export function readAllLexicons(paths: string[]): LexiconDoc[] {
+export function readAllLexicons(paths: Set<string>): LexiconDoc[] {
   const docs: LexiconDoc[] = []
   for (const path of paths) {
     if (!path.endsWith('.json') || !fs.statSync(path).isFile()) {
@@ -150,7 +150,7 @@ function printZodError(node: ZodFormattedError<any>, path = ''): boolean {
   return false
 }
 
-export function readdirRecursiveSync(root: string, endWith: string, files: string[] = [], prefix = ''): string[] {
+function readdirRecursiveSync(root: string, endWith: string, files: string[] = [], prefix = ''): string[] {
   const dir = path.join(root, prefix)
   if (!fs.existsSync(dir)) return files
   if (fs.statSync(dir).isDirectory())
