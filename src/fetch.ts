@@ -220,47 +220,13 @@ const getAllLexDependencies = async (schemaPath: string, generatedSchema: Genera
           }
         } else {
           const def = lexicons.getDefOrThrow(lexUri)
-          switch (def.type) {
-            case 'array':
-              if (def.items.type === 'ref') {
-                imports.add(stripScheme(def.items.ref.split('#')[0]))
-              } else if (def.items.type === 'union') {
-                def.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
-              }
-              break
-            case 'object':
-              if (def.properties) {
-                for (const propKey in def.properties) {
-                  const propDef = def.properties[propKey]
-                  if (propDef.type === 'ref') {
-                    imports.add(stripScheme(propDef.ref.split('#')[0]))
-                  } else if (propDef.type === 'union') {
-                    propDef.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
-                  } else {
-                    if (propDef.type === 'array') {
-                      if (propDef.items.type === 'ref') {
-                        imports.add(stripScheme(propDef.items.ref.split('#')[0]))
-                      } else if (propDef.items.type === 'union') {
-                        propDef.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
-                      }
-                    }
-                  }
-                }
-              }
-              break
-          }
-        }
-      } else {
-        const def = lexicons.getDefOrThrow(lexUri)
-        switch (def.type) {
-          case 'array':
+          if (def.type === 'array') {
             if (def.items.type === 'ref') {
               imports.add(stripScheme(def.items.ref.split('#')[0]))
             } else if (def.items.type === 'union') {
               def.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
             }
-            break
-          case 'object':
+          } else if (def.type === 'object') {
             if (def.properties) {
               for (const propKey in def.properties) {
                 const propDef = def.properties[propKey]
@@ -279,7 +245,35 @@ const getAllLexDependencies = async (schemaPath: string, generatedSchema: Genera
                 }
               }
             }
-            break
+          }
+        }
+      } else {
+        const def = lexicons.getDefOrThrow(lexUri)
+        if (def.type === 'array') {
+          if (def.items.type === 'ref') {
+            imports.add(stripScheme(def.items.ref.split('#')[0]))
+          } else if (def.items.type === 'union') {
+            def.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+          }
+        } else if (def.type === 'object') {
+          if (def.properties) {
+            for (const propKey in def.properties) {
+              const propDef = def.properties[propKey]
+              if (propDef.type === 'ref') {
+                imports.add(stripScheme(propDef.ref.split('#')[0]))
+              } else if (propDef.type === 'union') {
+                propDef.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+              } else {
+                if (propDef.type === 'array') {
+                  if (propDef.items.type === 'ref') {
+                    imports.add(stripScheme(propDef.items.ref.split('#')[0]))
+                  } else if (propDef.items.type === 'union') {
+                    propDef.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
