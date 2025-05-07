@@ -20,7 +20,7 @@ This is a ATProto ...
 ## コマンドの説明
 ### 読み込みに関して
 `local:<nsid>`で読み込むと、schemaDirで設定されているディレクトリ下のschemaを読み込みます。<br>
-`github:<nsid>`で読み込むと、githubから自動でschemaを読み込みます。今のところ`bsky.app, bsky.chat, atproto.com, ozone.tools, linkat.blue, whtwnd.com, unravel.fyi, smokesignal.events, pastesphere.link, psky.social, moji.blue, stellar.maril.blue, evex.land`に対応しています。<br>
+`github:<nsid>`で読み込むと、githubから自動でschemaを読み込みます。今のところ`bsky.app, bsky.chat, atproto.com, ozone.tools, linkat.blue, whtwnd.com, unravel.fyi, smokesignal.events, pastesphere.link, psky.social, moji.blue, stellar.maril.blue, evex.land, skyblur.uk`に対応しています。<br>
 `<url>:<nsid>`で読み込むと、指定されたURLからschemaを読み込みます。nsidのドットがそのままスラッシュに置き換わっているタイプのURLであれば、lexiconsディレクトリをURLに指定することでも読み込め、その場合依存関係を読み込む際にもそのURLが使われるようになります。
 
 ### 依存関係に関して
