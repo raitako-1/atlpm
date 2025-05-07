@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import yesno from 'yesno'
 import { ZodError, type ZodFormattedError } from 'zod'
 import { type LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
+import { NSID } from '@atproto/syntax'
 import { type FileDiff, type GeneratedFile } from './types'
 
 export async function confirmOrExit(q: string, noFn?: () => Promise<void>) {
@@ -43,7 +44,7 @@ export function readAllLexicons(paths: Set<string>): LexiconDoc[] {
   return docs
 }
 
-export function readLexicon(str: string, path: string, outErr: boolean = true): LexiconDoc {
+export function readLexicon(str: string, path: string, nsid?: NSID, outErr: boolean = true): LexiconDoc {
   let obj: unknown
   try {
     obj = JSON.parse(str)
@@ -51,10 +52,12 @@ export function readLexicon(str: string, path: string, outErr: boolean = true): 
     if (outErr) console.error(chalk.red(`Failed to parse JSON in file: ${path}`))
     throw e
   }
+  if (!nsid) nsid = NSID.parse((obj as LexiconDoc).id)
   if (
     obj &&
     typeof obj === 'object' &&
-    typeof (obj as LexiconDoc).lexicon === 'number'
+    typeof (obj as LexiconDoc).lexicon === 'number'&&
+    (obj as LexiconDoc).id === nsid.toString()
   ) {
     try {
       return parseLexiconDoc(obj)

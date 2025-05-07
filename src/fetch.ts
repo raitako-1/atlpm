@@ -55,13 +55,13 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
       if (outErr) console.error(chalk.red(`Failed to read file: ${schemaFullPath}`))
       throw e
     }
-    readLexicon(str, schemaFullPath, outErr)
+    readLexicon(str, schemaFullPath, nsid, outErr)
     return {path: schemaFileName, content: str}
   } else if (registry === 'github') {
     let url: URL
     const domain = Object.keys(registryData[registry]).find(domain => nsid.authority.endsWith(domain))
     if (domain) {
-      url = registryData[registry][domain].getUrl(nsid)
+      url = await registryData[registry][domain].getUrl(nsid)
     } else {
       if (outErr) console.error(chalk.red(`Unknown authority in github: ${nsid.authority}`))
       throw new Error('ERR_ATLPM_UNKNOWN_AUTHORITY', { cause: `Unknown authority in github: ${nsid.authority}`})
@@ -74,7 +74,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
       if (outErr) console.error(chalk.red(`Failed to GET url: ${url.href}`))
       throw e
     }
-    readLexicon(str, url.href, outErr)
+    readLexicon(str, url.href, nsid, outErr)
     return {path: schemaFileName, content: str}
   } else if (URL.canParse(registry)) {
     let url: URL
@@ -91,7 +91,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
       if (outErr) console.error(chalk.red(`Failed to GET url: ${url.href}`))
       throw e
     }
-    readLexicon(str, url.href, outErr)
+    readLexicon(str, url.href, nsid, outErr)
     return {path: schemaFileName, content: str}
   } else {
     if (outErr) console.error(chalk.red(`Unknown registry type: ${registry}`))
@@ -102,7 +102,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
 const getAllLexDependencies = async (schemaPath: string, generatedSchema: GeneratedSchema, nsid: NSID, content: string, registries: string[]): Promise<void> => {
   const schemaFileName = `${nsid.segments.join('/')}.json`
   const schemaFullPath = path.join(schemaPath, schemaFileName)
-  const lexiconDoc = readLexicon(content, schemaFullPath)
+  const lexiconDoc = readLexicon(content, schemaFullPath, nsid)
   for (const apiType of Object.keys(generatedSchema.api)) {
     const imports: Set<string> = new Set()
     const lexicons = new Lexicons([lexiconDoc])
