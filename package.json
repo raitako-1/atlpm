@@ -1,6 +1,6 @@
 {
   "name": "atlpm",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "ATProtocol Lexicon Package Manager",
   "bin": {
     "atlpm": "dist/index.js"
@@ -19,7 +19,7 @@
   "author": "raitako_1",
   "license": "MIT",
   "dependencies": {
-    "@atproto/lexicon": "^0.4.11",
+    "@atproto/lexicon": "^0.4.12",
     "@atproto/syntax": "^0.4.0",
     "@inquirer/prompts": "^7.6.0",
     "chalk": "^4.1.2",
@@ -30,7 +30,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/node": "^18.19.118",
+    "@types/node": "^18.19.119",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
   },
