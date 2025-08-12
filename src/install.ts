@@ -27,8 +27,8 @@ export async function install(
   console.log('All schemas wrote.')
 
   for (const apiType of Object.keys(manifest.apiTypes)) {
-    const schemaPaths: Set<string> = new Set()
-    for (const relativePath of schemaFiles.api[apiType]) schemaPaths.add(path.join(schemaPath, relativePath))
+    const schemaPaths: string[] = []
+    for (const relativePath of schemaFiles.api[apiType]) schemaPaths.push(path.join(schemaPath, relativePath))
     const lexicons = readAllLexicons(schemaPaths)
     const api = await genApi(lexicons, apiType as keyof ApiTypes)
     const apiDiff = genFileDiff(manifest.apiTypes[apiType], api.files, '.ts')
