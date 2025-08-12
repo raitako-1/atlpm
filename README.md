@@ -36,4 +36,5 @@ atlpm add -y \
 もし自動で読み込まれない依存関係が存在した場合は`${nsid} could not be loaded in any registry!`と表示されるようになっているので、そのようなschemaに関してはそれぞれ`atlpm.json`の`lexicons`に追記してください。
 
 ## 将来的には...
-将来的にはPDSなどによるlexicon解決やpublishに対応する計画です。※nsidのワイルドカード表記は今のところ対応する計画はありません。
+将来的にはPDSなどによるlexicon解決やpublishに対応する計画です。<br>
+※nsidのワイルドカード表記は依存関係を別ディレクトリで管理できるようになってから対応させるつもりです。
