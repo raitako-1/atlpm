@@ -22,7 +22,8 @@ export async function confirmOrExit(q: string, noFn?: () => Promise<void>) {
   }
 }
 
-export function readAllLexicons(paths: Set<string>): LexiconDoc[] {
+export function readAllLexicons(paths: string[]): LexiconDoc[] {
+  paths = [...paths].sort() // incoming path order may have come from locale-dependent shell globs
   const docs: LexiconDoc[] = []
   for (const path of paths) {
     if (!path.endsWith('.json') || !fs.statSync(path).isFile()) {

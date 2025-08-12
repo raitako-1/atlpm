@@ -65,10 +65,10 @@ const indexTs = (
         { name: 'createServer', alias: 'createXrpcServer' },
       ],
     })
-    //= import {schemas} from './lexicons.js'
+    //= import {schemas} from './lexicons'
     file
       .addImportDeclaration({
-        moduleSpecifier: './lexicons.js',
+        moduleSpecifier: './lexicons',
       })
       .addNamedImport({
         name: 'schemas',
@@ -85,7 +85,7 @@ const indexTs = (
       }
       file
         .addImportDeclaration({
-          moduleSpecifier: `./types/${lexiconDoc.id.split('.').join('/')}.js`,
+          moduleSpecifier: `./types/${lexiconDoc.id.split('.').join('/')}`,
         })
         .setNamespaceImport(toTitleCase(lexiconDoc.id))
     }
