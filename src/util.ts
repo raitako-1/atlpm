@@ -1,18 +1,20 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import yesno from 'yesno'
 import { ZodError, type ZodFormattedError } from 'zod'
+import { AtpAgent } from '@atproto/api'
+import { IdResolver } from '@atproto/identity'
 import { type LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
+import { confirm } from '@inquirer/prompts'
 import { type FileDiff, type GeneratedFile } from './types'
 
-export async function confirmOrExit(q: string, noFn?: () => Promise<void>) {
-  const ok = await yesno({
-    question: `${q} [y/N]`,
-    defaultValue: false,
+export async function confirmOrExit(message: string, noFn?: () => Promise<void>) {
+  const answer = await confirm({
+    message,
+    default: false,
   })
-  if (!ok) {
+  if (!answer) {
     if (noFn) {
       await noFn()
     } else {
@@ -170,4 +172,41 @@ function readdirRecursiveSync(root: string, endWith: string, files: string[] = [
 
 function dedup(arr: string[]): string[] {
   return Array.from(new Set(arr))
+}
+
+export const isRegistriedLex = async (nsid: NSID): Promise<boolean> => {
+  let dids: string[]
+  try {
+    const dnsRes: any = await (await fetch(`https://dns.google/resolve?name=_lexicon.${nsid.authority}&type=TXT`)).json()
+    dids = dnsRes.Answer.filter(v => v.data.startsWith('did=')).map(v => v.data.slice(4))
+  } catch {
+    return false
+  }
+  const idResolver = new IdResolver()
+  const records: LexiconDoc[] = []
+  for (const did of dids) {
+    const didDoc = await idResolver.did.resolve(did)
+    if (!didDoc?.service) {
+      continue
+    }
+    for (const {serviceEndpoint} of didDoc.service) {
+      if (typeof serviceEndpoint !== 'string') {
+        continue
+      }
+      try {
+        const agent = new AtpAgent({service: serviceEndpoint})
+        const xrpcRes = await agent.com.atproto.repo.getRecord({repo: did, collection: 'com.atproto.lexicon.schema', rkey: nsid.toString()})
+        delete xrpcRes.data.value['$type']
+        const lexiconDoc = parseLexiconDoc(xrpcRes.data.value)
+        records.push(lexiconDoc)
+      } catch {
+        continue
+      }
+    }
+  }
+  if (records.length === 0) {
+    return false
+  } else {
+    return true
+  }
 }
