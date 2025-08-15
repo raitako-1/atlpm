@@ -190,7 +190,7 @@ const getAllLexDependencies = async (schemaPath: string, generatedSchema: Genera
         let i = 0
         for (const registry of registries) {
           try {
-            console.log(chalk.gray(`\x1b[2KResolve ${nsid}`))
+            console.log(chalk.gray(`\x1b[2KResolve ${importNsid}`))
             const str = (await fetchSchema(schemaPath, NSID.parse(importNsid), registry)).content
             generatedSchema.all.push({path: `${importNsid.split('.').join('/')}.json`, content: str})
             await getAllLexDependencies(schemaPath, generatedSchema, NSID.parse(importNsid), str, registries)
