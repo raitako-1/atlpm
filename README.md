@@ -3,6 +3,9 @@
 Inspiration from [lpm](https://github.com/tom-sherman/lpm)<br>
 Forked from [@atproto/lex-cli](https://github.com/bluesky-social/atproto/blob/main/packages/lex-cli)
 
+[![NPM](https://img.shields.io/npm/v/atlpm)](https://www.npmjs.com/package/atlpm)
+[![Github CI Status](https://github.com/raitako-1/atlpm/actions/workflows/build.yml/badge.svg)](https://github.com/raitako-1/atlpm/actions/workflows/build.yml)
+
 This is a ATProto ...
 
 - **[Lexicon](https://atproto.com/specs/lexicon):** A schema definition language for ATProto.
@@ -12,8 +15,10 @@ This is a ATProto ...
 
 ... Package Manager.
 
-## How to use
+## Usage
 ```
+pnpm add atlpm
+
 atlpm init
 atlpm install
 atlpm add app.bsky.feed.post com.atproto.sync.subscribeRepos
