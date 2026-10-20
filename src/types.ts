@@ -44,18 +44,21 @@ type RegistryData = {
 export const registryData: RegistryData = {
   github: {
     'bsky.app': {
-      getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/atproto/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
+      getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/bsky/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
     },
     'bsky.chat': {
-      getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/atproto/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
+      getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/bsky/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
     },
     'atproto.com': {
       getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/atproto/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
     },
+    'bsky.network': {
+      getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/bsky/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
+    },
     'ozone.tools': {
       getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/bluesky-social/atproto/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
     },
-    'linkat.blue': {
+    /*'linkat.blue': {
       getUrl: async (nsid) => {return new URL(`https://raw.githubusercontent.com/mkizka/linkat/refs/heads/main/lexicons/${nsid.segments.join('/')}.json`)},
     },
     'whtwnd.com': {
@@ -96,6 +99,6 @@ export const registryData: RegistryData = {
         }
         return new URL(`${inferUrl}.json`)
       },
-    },
+    },*/
   },
 }
