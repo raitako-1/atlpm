@@ -1,13 +1,13 @@
 import {
   IndentationText,
   Project,
-  SourceFile,
+  type SourceFile,
   VariableDeclarationKind,
 } from 'ts-morph'
 import { type LexiconDoc, Lexicons } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
-import { type GeneratedAPI } from '../types'
-import { gen, lexiconsTs, utilTs } from './common'
+import type { GeneratedAPI } from '../types.js'
+import { gen, lexiconsTs, utilTs } from './common.js'
 import {
   genCommonImports,
   genImports,
@@ -16,7 +16,7 @@ import {
   genXrpcInput,
   genXrpcOutput,
   genXrpcParams,
-} from './lex-gen'
+} from './lex-gen.js'
 import {
   type DefTreeNode,
   lexiconsToDefTree,
@@ -24,7 +24,7 @@ import {
   toCamelCase,
   toScreamingSnakeCase,
   toTitleCase,
-} from './util'
+} from './util.js'
 
 export async function genServerApi(
   lexiconDocs: LexiconDoc[],
@@ -53,7 +53,7 @@ const indexTs = (
   nsidTokens: Record<string, string[]>,
 ) =>
   gen(project, '/index.ts', async (file) => {
-    //= import { type Auth, type Options as XrpcOptions, Server as XrpcServer, type StreamConfigOrHandler, type MethodConfigOrHandler, createServer as createXrpcServer } from '@atproto/xrpc-server'
+    //= import {createServer as createXrpcServer, Server as XrpcServer} from '@atproto/xrpc-server'
     file.addImportDeclaration({
       moduleSpecifier: '@atproto/xrpc-server',
       namedImports: [
@@ -65,10 +65,10 @@ const indexTs = (
         { name: 'createServer', alias: 'createXrpcServer' },
       ],
     })
-    //= import {schemas} from './lexicons'
+    //= import {schemas} from './lexicons.js'
     file
       .addImportDeclaration({
-        moduleSpecifier: './lexicons',
+        moduleSpecifier: './lexicons.js',
       })
       .addNamedImport({
         name: 'schemas',
@@ -85,7 +85,7 @@ const indexTs = (
       }
       file
         .addImportDeclaration({
-          moduleSpecifier: `./types/${lexiconDoc.id.split('.').join('/')}`,
+          moduleSpecifier: `./types/${lexiconDoc.id.split('.').join('/')}.js`,
         })
         .setNamespaceImport(toTitleCase(lexiconDoc.id))
     }
@@ -258,7 +258,11 @@ function genNamespaceCls(file: SourceFile, ns: DefTreeNode) {
   }
 }
 
-const lexiconTs = (project: Project, lexicons: Lexicons, lexiconDoc: LexiconDoc) =>
+const lexiconTs = (
+  project: Project,
+  lexicons: Lexicons,
+  lexiconDoc: LexiconDoc,
+) =>
   gen(
     project,
     `/types/${lexiconDoc.id.split('.').join('/')}.ts`,
@@ -297,6 +301,8 @@ const lexiconTs = (project: Project, lexicons: Lexicons, lexiconDoc: LexiconDoc)
             genServerXrpcStreaming(file, lexicons, lexUri)
           } else if (def.type === 'record') {
             genRecord(file, imports, lexicons, lexUri)
+          } else if (def.type === 'permission-set') {
+            continue
           } else {
             genUserType(file, imports, lexicons, lexUri)
           }

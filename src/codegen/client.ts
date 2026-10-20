@@ -1,13 +1,13 @@
 import {
   IndentationText,
   Project,
-  SourceFile,
+  type SourceFile,
   VariableDeclarationKind,
 } from 'ts-morph'
 import { type LexRecord, type LexiconDoc, Lexicons } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
-import { type GeneratedAPI } from '../types'
-import { gen, lexiconsTs, utilTs } from './common'
+import type { GeneratedAPI } from '../types.js'
+import { gen, lexiconsTs, utilTs } from './common.js'
 import {
   genCommonImports,
   genImports,
@@ -16,7 +16,7 @@ import {
   genXrpcInput,
   genXrpcOutput,
   genXrpcParams,
-} from './lex-gen'
+} from './lex-gen.js'
 import {
   type DefTreeNode,
   lexiconsToDefTree,
@@ -24,7 +24,7 @@ import {
   toCamelCase,
   toScreamingSnakeCase,
   toTitleCase,
-} from './util'
+} from './util.js'
 
 const ATP_METHODS = {
   list: 'com.atproto.repo.listRecords',
@@ -70,9 +70,9 @@ const indexTs = (
       { name: 'FetchHandler', isTypeOnly: true },
       { name: 'FetchHandlerOptions', isTypeOnly: true },
     ])
-    //= import {schemas} from './lexicons'
+    //= import {schemas} from './lexicons.js'
     file
-      .addImportDeclaration({ moduleSpecifier: './lexicons' })
+      .addImportDeclaration({ moduleSpecifier: './lexicons.js' })
       .addNamedImports([{ name: 'schemas' }])
     //= import {CID} from 'multiformats/cid'
     file
@@ -81,9 +81,9 @@ const indexTs = (
       })
       .addNamedImports([{ name: 'CID' }])
 
-    //= import { type OmitKey, type Un$Typed } from './util'
+    //= import { type OmitKey, type Un$Typed } from './util.js'
     file
-      .addImportDeclaration({ moduleSpecifier: `./util` })
+      .addImportDeclaration({ moduleSpecifier: `./util.js` })
       .addNamedImports([
         { name: 'OmitKey', isTypeOnly: true },
         { name: 'Un$Typed', isTypeOnly: true },
@@ -91,7 +91,7 @@ const indexTs = (
 
     // generate type imports and re-exports
     for (const lexicon of lexiconDocs) {
-      const moduleSpecifier = `./types/${lexicon.id.split('.').join('/')}`
+      const moduleSpecifier = `./types/${lexicon.id.split('.').join('/')}.js`
       file
         .addImportDeclaration({ moduleSpecifier })
         .setNamespaceImport(toTitleCase(lexicon.id))
@@ -431,7 +431,11 @@ function genRecordCls(file: SourceFile, nsid: string, lexRecord: LexRecord) {
   }
 }
 
-const lexiconTs = (project: Project, lexicons: Lexicons, lexiconDoc: LexiconDoc) =>
+const lexiconTs = (
+  project: Project,
+  lexicons: Lexicons,
+  lexiconDoc: LexiconDoc,
+) =>
   gen(
     project,
     `/types/${lexiconDoc.id.split('.').join('/')}.ts`,
@@ -442,7 +446,7 @@ const lexiconTs = (project: Project, lexicons: Lexicons, lexiconDoc: LexiconDoc)
         main?.type === 'subscription' ||
         main?.type === 'procedure'
       ) {
-        //= import { type HeadersMap, XRPCError } from '@atproto/xrpc'
+        //= import {HeadersMap, XRPCError} from '@atproto/xrpc'
         const xrpcImport = file.addImportDeclaration({
           moduleSpecifier: '@atproto/xrpc',
         })
@@ -468,6 +472,8 @@ const lexiconTs = (project: Project, lexicons: Lexicons, lexiconDoc: LexiconDoc)
             continue
           } else if (def.type === 'record') {
             genRecord(file, imports, lexicons, lexUri)
+          } else if (def.type === 'permission-set') {
+            continue
           } else {
             genUserType(file, imports, lexicons, lexUri)
           }

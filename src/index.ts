@@ -6,16 +6,15 @@ import fs from 'fs'
 import path from 'path'
 import { AtpAgent } from '@atproto/api'
 import { wait } from '@atproto/common'
-import { LexiconDoc } from '@atproto/lexicon'
+import type { LexiconDoc } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
 import { checkbox, editor, input, password as _password } from '@inquirer/prompts'
-import { install } from './install'
-import { type AtlpmManifest, registryData } from './types'
-import { confirmOrExit, isRegistriedLex, readLexicon } from './util'
-import * as pkg from '../package.json'
+import { install } from './install.js'
+import { type AtlpmManifest, registryData } from './types.js'
+import { confirmOrExit, isRegistriedLex, readLexicon } from './util.js'
 
 const program = new Command()
-program.name(pkg.name).description(pkg.description).version(pkg.version)
+program.name(process.env.npm_package_name ?? '').description(process.env.npm_package_description ?? '').version(process.env.npm_package_version ?? '')
 
 program
   .command('add')
@@ -73,7 +72,7 @@ program
       }
     }
     if (modtext.split('\n').length > 1) console.log(modtext)
-    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object, key) => {
+    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object: Record<string, string>, key: string) => {
       if (manifest.lexicons) object[key] = manifest.lexicons[key]
       return object
     }, {})
@@ -232,7 +231,7 @@ program
       }
     }
     if (modtext.split('\n').length > 1) console.log(modtext)
-    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object, key) => {
+    manifest.lexicons = Object.keys(manifest.lexicons).sort().reduce((object: Record<string, string>, key: string) => {
       if (manifest.lexicons) object[key] = manifest.lexicons[key]
       return object
     }, {})
@@ -252,7 +251,7 @@ function toPath(v: string) {
 const checkDns = async (nsid: NSID, agent: AtpAgent, sendMsg: boolean) => {
   try {
       const dnsRes: any = await (await fetch(`https://dns.google/resolve?name=_lexicon.${nsid.authority}&type=TXT`)).json()
-      const dids = dnsRes.Answer.filter(v => v.data.startsWith('did=')).map(v => v.data.slice(4))
+      const dids = dnsRes.Answer.filter((v: any) => v.data.startsWith('did=')).map((v: any) => v.data.slice(4))
       if (!dids.includes(agent.assertDid)) throw new Error()
     } catch {
       if (sendMsg) {

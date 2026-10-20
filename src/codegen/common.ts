@@ -1,8 +1,12 @@
 import { type Options as PrettierOptions, format } from 'prettier'
-import { Project, SourceFile, VariableDeclarationKind } from 'ts-morph'
-import { type LexiconDoc } from '@atproto/lexicon'
-import { type GeneratedFile } from '../types'
-import { toTitleCase } from './util'
+import {
+  type Project,
+  type SourceFile,
+  VariableDeclarationKind,
+} from 'ts-morph'
+import type { LexiconDoc } from '@atproto/lexicon'
+import type { GeneratedFile } from '../types.js'
+import { toTitleCase } from './util.js'
 
 const PRETTIER_OPTS: PrettierOptions = {
   parser: 'typescript',
@@ -133,9 +137,9 @@ export function asPredicate<V extends Validator>(validate: V) {
 `)
   })
 
-export const lexiconsTs = (project, lexicons: LexiconDoc[]) =>
+export const lexiconsTs = (project: Project, lexicons: LexiconDoc[]) =>
   gen(project, '/lexicons.ts', async (file) => {
-    //= import {type LexiconDoc, Lexicons, ValidationError, type ValidationResult} from '@atproto/lexicon'
+    //= import { type LexiconDoc, Lexicons } from '@atproto/lexicon'
     file
       .addImportDeclaration({
         moduleSpecifier: '@atproto/lexicon',
@@ -147,10 +151,10 @@ export const lexiconsTs = (project, lexicons: LexiconDoc[]) =>
         { name: 'ValidationResult', isTypeOnly: true },
       ])
 
-    //= import {type $Typed, is$typed, maybe$typed} from './util'
+    //= import { is$typed, maybe$typed, type $Typed } from './util.js'
     file
       .addImportDeclaration({
-        moduleSpecifier: './util',
+        moduleSpecifier: './util.js',
       })
       .addNamedImports([
         { name: '$Typed', isTypeOnly: true },

@@ -1,17 +1,17 @@
 import { relative as getRelativePath } from 'node:path/posix'
-import { JSDoc, SourceFile, VariableDeclarationKind } from 'ts-morph'
-import {
-  type LexArray,
-  type LexBlob,
-  type LexBytes,
-  type LexCidLink,
-  type LexIpldType,
-  type LexObject,
-  type LexPrimitive,
-  type LexToken,
+import { type JSDoc, type SourceFile, VariableDeclarationKind } from 'ts-morph'
+import type {
+  LexArray,
+  LexBlob,
+  LexBytes,
+  LexCidLink,
+  LexIpldType,
+  LexObject,
+  LexPrimitive,
+  LexToken,
   Lexicons,
 } from '@atproto/lexicon'
-import { toCamelCase, toScreamingSnakeCase, toTitleCase } from './util'
+import { toCamelCase, toScreamingSnakeCase, toTitleCase } from './util.js'
 
 interface Commentable {
   addJsDoc: ({ description }: { description: string }) => JSDoc
@@ -27,7 +27,7 @@ export function genComment<T extends Commentable>(
 }
 
 export function genCommonImports(file: SourceFile, baseNsid: string) {
-  //= import { type ValidationResult, BlobRef } from '@atproto/lexicon'
+  //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
   file
     .addImportDeclaration({
       moduleSpecifier: '@atproto/lexicon',
@@ -50,7 +50,7 @@ export function genCommonImports(file: SourceFile, baseNsid: string) {
       moduleSpecifier: `${baseNsid
         .split('.')
         .map((_str) => '..')
-        .join('/')}/lexicons`,
+        .join('/')}/lexicons.js`,
     })
     .addNamedImports([{ name: 'validate', alias: '_validate' }])
 
@@ -60,7 +60,7 @@ export function genCommonImports(file: SourceFile, baseNsid: string) {
       moduleSpecifier: `${baseNsid
         .split('.')
         .map((_str) => '..')
-        .join('/')}/util`,
+        .join('/')}/util.js`,
     })
     .addNamedImports([
       { name: '$Typed', isTypeOnly: true },
@@ -68,11 +68,11 @@ export function genCommonImports(file: SourceFile, baseNsid: string) {
       { name: 'OmitKey', isTypeOnly: true },
     ])
 
-  // tsc adds protection against circular imports, which hurts bundle size.
-  // Since we know that lexicon.ts and util.ts do not depend on the file being
-  // generated, we can safely bypass this protection.
-  // Note that we are not using `import * as util from '../../util'` because
-  // typescript will emit is own helpers for the import, which we want to avoid.
+  // TypeScript adds protection against circular imports, which hurts bundle
+  // size. Since we know that lexicon.ts and util.ts do not depend on the file
+  // being generated, we can safely bypass this protection. Note that we are not
+  // using `import * as util from '../../util.js'` because typescript will emit
+  // is own helpers for the import, which we want to avoid.
   file.addVariableStatement({
     isExported: false,
     declarationKind: VariableDeclarationKind.Const,
@@ -98,7 +98,7 @@ export function genImports(
   const startPath = '/' + baseNsid.split('.').slice(0, -1).join('/')
 
   for (const nsid of imports) {
-    const targetPath = '/' + nsid.split('.').join('/')
+    const targetPath = '/' + nsid.split('.').join('/') + '.js'
     let resolvedPath = getRelativePath(startPath, targetPath)
     if (!resolvedPath.startsWith('.')) {
       resolvedPath = `./${resolvedPath}`
@@ -520,18 +520,44 @@ export function genRecord(
   lexicons: Lexicons,
   lexUri: string,
 ) {
+  const hash = getHash(lexUri)
+  const ifaceName: string = toTitleCase(hash)
   const def = lexicons.getDefOrThrow(lexUri, ['record'])
 
-  //= export interface Record {...}
-  genObject(file, imports, lexUri, def.record, 'Record', {
+  //= export interface {X} {...}
+  genObject(file, imports, lexUri, def.record, ifaceName, {
     defaultsArePresent: true,
     allowUnknownProperties: true,
     typeProperty: 'required',
   })
 
-  //= export function isRecord(v: unknown): v is Record {...}
-  genObjHelpers(file, lexUri, 'Record', {
+  //= export function is{X}(v: unknown): v is {X} {...}
+  genObjHelpers(file, lexUri, ifaceName, {
     requireTypeProperty: true,
+  })
+
+  // For convenience, we re-export the type and the type guard under the generic
+  // names "Record", "isRecord" and "validateRecord".
+  // @NOTE This does not account for potential name clashes with a potential
+  // "#record" def.
+
+  //= export { {X} as Record, is{X} as isRecord }
+  file.addExportDeclaration({
+    namedExports: [
+      {
+        isTypeOnly: true,
+        name: ifaceName,
+        alias: 'Record',
+      },
+      {
+        name: `is${ifaceName}`,
+        alias: 'isRecord',
+      },
+      {
+        name: `validate${ifaceName}`,
+        alias: 'validateRecord',
+      },
+    ],
   })
 }
 

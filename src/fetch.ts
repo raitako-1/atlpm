@@ -5,11 +5,11 @@ import { AtpAgent } from '@atproto/api'
 import { IdResolver } from '@atproto/identity'
 import { Lexicons, type LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
-import { type ApiTypes, type GeneratedFile, type GeneratedSchema, registryData } from './types'
-import { readLexicon } from './util'
+import { type ApiTypes, type GeneratedFile, type GeneratedSchema, registryData } from './types.js'
+import { readLexicon } from './util.js'
 import {
   stripScheme,
-} from './codegen/lex-gen'
+} from './codegen/lex-gen.js'
 
 export async function fetchAllSchemas(
   schemaPath: string,
@@ -65,7 +65,7 @@ const fetchSchema = async (schemaPath: string, nsid: NSID, registry: string, out
     try {
       process.stdout.write(chalk.gray(`\x1b[2KSearch did for _lexicon.${nsid.authority}\r`))
       const dnsRes: any = await (await fetch(`https://dns.google/resolve?name=_lexicon.${nsid.authority}&type=TXT`)).json()
-      dids = dnsRes.Answer.filter(v => v.data.startsWith('did=')).map(v => v.data.slice(4))
+      dids = dnsRes.Answer.filter((v: any) => v.data.startsWith('did=')).map((v: any) => v.data.slice(4))
       if (dids.length === 0) throw new Error()
     } catch (e) {
       if (outErr) console.error(chalk.red(`\x1b[2KNot found did for _lexicon.${nsid.authority}`))
@@ -206,41 +206,41 @@ const getAllLexDependencies = async (schemaPath: string, generatedSchema: Genera
   }
 }
 
-const getImportFromSchema = (schema, imports: Set<string>) => {
+const getImportFromSchema = (schema: any, imports: Set<string>) => {
   if (schema.type === 'ref') {
     imports.add(stripScheme(schema.ref.split('#')[0]))
   } else if (schema.type === 'union') {
-    schema.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+    schema.refs.map((ref: string) => imports.add(stripScheme(ref.split('#')[0])))
   } else {
     if (schema.properties) getImportFromProperties(schema.properties, imports)
   }
 }
 
-const getImportFromOtherDef = (def, imports: Set<string>) => {
+const getImportFromOtherDef = (def: any, imports: Set<string>) => {
   if (def.type === 'array') {
     if (def.items.type === 'ref') {
       imports.add(stripScheme(def.items.ref.split('#')[0]))
     } else if (def.items.type === 'union') {
-      def.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+      def.items.refs.map((ref: string) => imports.add(stripScheme(ref.split('#')[0])))
     }
   } else if (def.type === 'object') {
     if (def.properties) getImportFromProperties(def.properties, imports)
   }
 }
 
-const getImportFromProperties = (properties, imports: Set<string>) => {
+const getImportFromProperties = (properties: any, imports: Set<string>) => {
   for (const propKey in properties) {
     const propDef = properties[propKey]
     if (propDef.type === 'ref') {
       imports.add(stripScheme(propDef.ref.split('#')[0]))
     } else if (propDef.type === 'union') {
-      propDef.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+      propDef.refs.map((ref: string) => imports.add(stripScheme(ref.split('#')[0])))
     } else {
       if (propDef.type === 'array') {
         if (propDef.items.type === 'ref') {
           imports.add(stripScheme(propDef.items.ref.split('#')[0]))
         } else if (propDef.items.type === 'union') {
-          propDef.items.refs.map((ref) => imports.add(stripScheme(ref.split('#')[0])))
+          propDef.items.refs.map((ref: string) => imports.add(stripScheme(ref.split('#')[0])))
         }
       }
     }

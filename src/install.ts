@@ -1,13 +1,13 @@
 import path from 'path'
-import { ApiTypes, type AtlpmManifest } from './types'
-import { genApi } from './codegen'
-import { fetchAllSchemas } from './fetch'
+import type { ApiTypes, AtlpmManifest } from './types.js'
+import { genApi } from './codegen/index.js'
+import { fetchAllSchemas } from './fetch.js'
 import {
   applyFileDiff,
   genFileDiff,
   printFileDiff,
   readAllLexicons,
-} from './util'
+} from './util.js'
 
 export async function install(
   manifest: AtlpmManifest,

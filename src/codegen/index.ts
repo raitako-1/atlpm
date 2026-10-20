@@ -1,7 +1,7 @@
 import { type LexiconDoc } from '@atproto/lexicon'
-import { type ApiTypes, type GeneratedAPI } from '../types'
-import { genClientApi } from './client'
-import { genServerApi } from './server'
+import { type ApiTypes, type GeneratedAPI } from '../types.js'
+import { genClientApi } from './client.js'
+import { genServerApi } from './server.js'
 
 export async function genApi(
   lexiconDocs: LexiconDoc[],

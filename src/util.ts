@@ -7,7 +7,7 @@ import { IdResolver } from '@atproto/identity'
 import { type LexiconDoc, parseLexiconDoc } from '@atproto/lexicon'
 import { NSID } from '@atproto/syntax'
 import { confirm } from '@inquirer/prompts'
-import { type FileDiff, type GeneratedFile } from './types'
+import { type FileDiff, type GeneratedFile } from './types.js'
 
 export async function confirmOrExit(message: string, noFn?: () => Promise<void>) {
   const answer = await confirm({
@@ -40,7 +40,7 @@ export function readAllLexicons(paths: string[]): LexiconDoc[] {
         throw e
       }
       docs.push(readLexicon(str, path))
-    } catch (e) {
+    } catch {
       // skip
     }
   }
@@ -178,7 +178,7 @@ export const isRegistriedLex = async (nsid: NSID): Promise<boolean> => {
   let dids: string[]
   try {
     const dnsRes: any = await (await fetch(`https://dns.google/resolve?name=_lexicon.${nsid.authority}&type=TXT`)).json()
-    dids = dnsRes.Answer.filter(v => v.data.startsWith('did=')).map(v => v.data.slice(4))
+    dids = dnsRes.Answer.filter((v: any) => v.data.startsWith('did=')).map((v: any) => v.data.slice(4))
   } catch {
     return false
   }
